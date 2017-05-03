@@ -545,7 +545,9 @@ FOUNDATION_STATIC_INLINE NSUInteger SDCacheCostForImage(UIImage *image) {
             // Store a reference to this file and account for its total size.
             NSNumber *totalAllocatedSize = resourceValues[NSURLTotalFileAllocatedSizeKey];
             currentCacheSize += [totalAllocatedSize unsignedIntegerValue];
-            [cacheFiles setObject:resourceValues forKey:fileURL];
+            if (resourceValues != nil) {
+                [cacheFiles setObject:resourceValues forKey:fileURL];
+            }
         }
         
         for (NSURL *fileURL in urlsToDelete) {
