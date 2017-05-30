@@ -300,10 +300,24 @@ didReceiveResponse:(NSURLResponse *)response
 
 #pragma mark NSURLSessionTaskDelegate
 
+- (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task willPerformHTTPRedirection:(NSHTTPURLResponse *)response newRequest:(NSURLRequest *)request completionHandler:(void (^)(NSURLRequest * _Nullable))completionHandler {
+    NSURL *removed = [NSURL URLWithString:@"http://i.imgur.com/removed.png"];
+    
+    if ([request.URL isEqual:removed]) {
+        completionHandler(nil);
+    } else {
+        completionHandler(request);
+    };
+}
+
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error {
     // Identify the operation that runs this task and pass it the delegate method
     SDWebImageDownloaderOperation *dataOperation = [self operationWithTask:task];
-
+    
+    if ([task.response isKindOfClass:[NSHTTPURLResponse class]] && [((NSHTTPURLResponse *)task.response) statusCode] == 302) {
+        error = [NSError errorWithDomain:@"i.imgur.com" code:302 userInfo:nil];
+    }
+    
     [dataOperation URLSession:session task:task didCompleteWithError:error];
 }
 
